@@ -1,8 +1,8 @@
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from 'react';
 import RNFS from 'react-native-fs';
-import {PermissionsAndroid, Platform} from 'react-native';
-import {VideoFile, VideoFolder} from '../types';
-import {isVideoFile} from '../utils/fileUtils';
+import { PermissionsAndroid, Platform } from 'react-native';
+import { VideoFile, VideoFolder } from '../types';
+import { isVideoFile } from '../utils/fileUtils';
 
 const STORAGE_ROOT = '/storage/emulated/0';
 const SKIP_DIRS = new Set(['Android', 'data', '.thumbnails', '.trash', 'obb']);
@@ -62,12 +62,12 @@ function groupByFolder(videos: VideoFile[]): VideoFolder[] {
     const folderPath = video.path.substring(0, sep);
     const folderName = folderPath.substring(folderPath.lastIndexOf('/') + 1) || 'Storage';
     if (!map.has(folderPath)) {
-      map.set(folderPath, {name: folderName, path: folderPath, videos: []});
+      map.set(folderPath, { name: folderName, path: folderPath, videos: [] });
     }
     map.get(folderPath)!.videos.push(video);
   }
   return Array.from(map.values())
-    .filter(f => f.videos.length > 0)
+    .filter((f) => f.videos.length > 0)
     .sort((a, b) => b.videos.length - a.videos.length);
 }
 
@@ -94,5 +94,5 @@ export function useVideoFolders() {
     }
   }, []);
 
-  return {folders, loading, error, load};
+  return { folders, loading, error, load };
 }

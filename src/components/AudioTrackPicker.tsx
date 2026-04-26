@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
-import {AudioTrack} from '../types';
+import { Modal, View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { AudioTrack } from '../types';
 
 interface Props {
   tracks: AudioTrack[];
@@ -16,12 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-export default function AudioTrackPicker({
-  tracks,
-  selectedIndex,
-  onSelect,
-  onClose,
-}: Props) {
+export default function AudioTrackPicker({ tracks, selectedIndex, onSelect, onClose }: Props) {
   function trackLabel(track: AudioTrack): string {
     if (track.title) {
       return track.language ? `${track.title} (${track.language})` : track.title;
@@ -33,32 +21,20 @@ export default function AudioTrackPicker({
   }
 
   return (
-    <Modal
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}>
-      <TouchableOpacity
-        style={styles.backdrop}
-        onPress={onClose}
-        activeOpacity={1}
-      />
+    <Modal transparent animationType="slide" onRequestClose={onClose}>
+      <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
       <View style={styles.sheet}>
         <View style={styles.handle} />
         <Text style={styles.heading}>Audio Track</Text>
         <FlatList
           data={tracks}
-          keyExtractor={item => item.index.toString()}
-          renderItem={({item}) => (
+          keyExtractor={(item) => item.index.toString()}
+          renderItem={({ item }) => (
             <TouchableOpacity
-              style={[
-                styles.row,
-                item.index === selectedIndex && styles.rowSelected,
-              ]}
+              style={[styles.row, item.index === selectedIndex && styles.rowSelected]}
               onPress={() => onSelect(item.index)}>
               <Text style={styles.trackLabel}>{trackLabel(item)}</Text>
-              {item.index === selectedIndex && (
-                <Text style={styles.check}>✓</Text>
-              )}
+              {item.index === selectedIndex && <Text style={styles.check}>✓</Text>}
             </TouchableOpacity>
           )}
         />
@@ -104,7 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  rowSelected: {backgroundColor: '#2a2a2a'},
-  trackLabel: {color: '#fff', fontSize: 16},
-  check: {color: '#e50914', fontSize: 20, fontWeight: 'bold'},
+  rowSelected: { backgroundColor: '#2a2a2a' },
+  trackLabel: { color: '#fff', fontSize: 16 },
+  check: { color: '#e50914', fontSize: 20, fontWeight: 'bold' },
 });

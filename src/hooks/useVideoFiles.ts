@@ -1,8 +1,8 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import RNFS from 'react-native-fs';
-import {PermissionsAndroid, Platform} from 'react-native';
-import {VideoFile} from '../types';
-import {isVideoFile} from '../utils/fileUtils';
+import { PermissionsAndroid, Platform } from 'react-native';
+import { VideoFile } from '../types';
+import { isVideoFile } from '../utils/fileUtils';
 
 export function useVideoFiles() {
   const [files, setFiles] = useState<VideoFile[]>([]);
@@ -11,7 +11,7 @@ export function useVideoFiles() {
 
   useEffect(() => {
     loadFiles();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function requestPermission(): Promise<boolean> {
@@ -38,8 +38,8 @@ export function useVideoFiles() {
       }
       const items = await RNFS.readDir(RNFS.DownloadDirectoryPath);
       const videoFiles: VideoFile[] = items
-        .filter(item => item.isFile() && isVideoFile(item.name))
-        .map(item => ({
+        .filter((item) => item.isFile() && isVideoFile(item.name))
+        .map((item) => ({
           name: item.name,
           path: item.path,
           size: item.size,
@@ -54,5 +54,5 @@ export function useVideoFiles() {
     }
   }
 
-  return {files, loading, error, reload: loadFiles};
+  return { files, loading, error, reload: loadFiles };
 }

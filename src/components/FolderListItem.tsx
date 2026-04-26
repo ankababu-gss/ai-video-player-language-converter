@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  TouchableHighlight,
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-} from 'react-native';
-import {VideoFolder} from '../types';
+import { TouchableHighlight, View, Text, StyleSheet, Platform } from 'react-native';
+import { VideoFolder } from '../types';
 
 interface Props {
   folder: VideoFolder;
@@ -36,11 +30,11 @@ function avatarColor(name: string): string {
 const isTV = Platform.isTV;
 const SCALE = isTV ? 1.4 : 1;
 
-export default function FolderListItem({folder, onPress, hasTVPreferredFocus}: Props) {
+export default function FolderListItem({ folder, onPress, hasTVPreferredFocus }: Props) {
   const letter = folder.name.charAt(0).toUpperCase() || '#';
   const bg = avatarColor(folder.name);
   const count = folder.videos.length;
-  const tvProps = isTV && hasTVPreferredFocus ? {hasTVPreferredFocus: true} : {};
+  const tvProps = isTV && hasTVPreferredFocus ? { hasTVPreferredFocus: true } : {};
 
   return (
     <TouchableHighlight
@@ -49,7 +43,7 @@ export default function FolderListItem({folder, onPress, hasTVPreferredFocus}: P
       underlayColor="#1A1A2E"
       style={styles.item}>
       <View style={styles.row}>
-        <View style={[styles.avatar, {backgroundColor: bg}]}>
+        <View style={[styles.avatar, { backgroundColor: bg }]}>
           <Text style={styles.avatarLetter}>{letter}</Text>
         </View>
         <View style={styles.info}>
@@ -94,7 +88,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
-  info: {flex: 1},
+  info: { flex: 1 },
   name: {
     fontSize: 15 * SCALE,
     fontWeight: '600',

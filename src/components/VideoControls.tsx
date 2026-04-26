@@ -1,14 +1,8 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Slider from '@react-native-community/slider';
-import {PlayerState} from '../types';
-import {formatDuration, getFileNameWithoutExtension} from '../utils/fileUtils';
+import { PlayerState } from '../types';
+import { formatDuration, getFileNameWithoutExtension } from '../utils/fileUtils';
 import AudioTrackPicker from './AudioTrackPicker';
 
 interface Props {
@@ -55,10 +49,7 @@ export default function VideoControls({
     <View style={styles.overlay} pointerEvents="box-none">
       {/* Top bar */}
       <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={onBack}
-          style={styles.backBtn}
-          hasTVPreferredFocus={isTV}>
+        <TouchableOpacity onPress={onBack} style={styles.backBtn} hasTVPreferredFocus={isTV}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.titleText} numberOfLines={1}>
@@ -68,9 +59,7 @@ export default function VideoControls({
           <Text style={styles.speedText}>{speedLabel(state.playbackSpeed)}</Text>
         </TouchableOpacity>
         {state.audioTracks.length > 1 && (
-          <TouchableOpacity
-            style={styles.audioBtn}
-            onPress={() => setShowAudioPicker(true)}>
+          <TouchableOpacity style={styles.audioBtn} onPress={() => setShowAudioPicker(true)}>
             <Text style={styles.audioBtnText}>Audio</Text>
           </TouchableOpacity>
         )}
@@ -137,27 +126,19 @@ export default function VideoControls({
             style={[styles.navBtn, !onPrev && styles.navBtnDisabled]}
             onPress={onPrev}
             disabled={!onPrev}>
-            <Text style={[styles.navBtnText, !onPrev && styles.navBtnTextDisabled]}>
-              |◀
-            </Text>
+            <Text style={[styles.navBtnText, !onPrev && styles.navBtnTextDisabled]}>|◀</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.skipBtn}
-            onPress={() => onSeekDelta(-10)}>
+          <TouchableOpacity style={styles.skipBtn} onPress={() => onSeekDelta(-10)}>
             <Text style={styles.skipText}>10</Text>
             <Text style={styles.skipArrow}>◀</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.playBtn} onPress={onTogglePause}>
-            <Text style={styles.playBtnText}>
-              {state.paused ? '▶' : '⏸'}
-            </Text>
+            <Text style={styles.playBtnText}>{state.paused ? '▶' : '⏸'}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.skipBtn}
-            onPress={() => onSeekDelta(10)}>
+          <TouchableOpacity style={styles.skipBtn} onPress={() => onSeekDelta(10)}>
             <Text style={styles.skipArrow}>▶</Text>
             <Text style={styles.skipText}>10</Text>
           </TouchableOpacity>
@@ -166,9 +147,7 @@ export default function VideoControls({
             style={[styles.navBtn, !onNext && styles.navBtnDisabled]}
             onPress={onNext}
             disabled={!onNext}>
-            <Text style={[styles.navBtnText, !onNext && styles.navBtnTextDisabled]}>
-              ▶|
-            </Text>
+            <Text style={[styles.navBtnText, !onNext && styles.navBtnTextDisabled]}>▶|</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -177,7 +156,7 @@ export default function VideoControls({
         <AudioTrackPicker
           tracks={state.audioTracks}
           selectedIndex={state.selectedAudioTrackIndex}
-          onSelect={index => {
+          onSelect={(index) => {
             onSelectAudioTrack(index);
             setShowAudioPicker(false);
           }}
@@ -210,7 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backArrow: {fontSize: 18 * SCALE, color: '#FFFFFF'},
+  backArrow: { fontSize: 18 * SCALE, color: '#FFFFFF' },
   titleText: {
     flex: 1,
     color: '#FFFFFF',
@@ -241,7 +220,7 @@ const styles = StyleSheet.create({
     fontSize: 12 * SCALE,
     fontWeight: '500',
   },
-  spacer: {flex: 1},
+  spacer: { flex: 1 },
   bottomArea: {
     paddingHorizontal: 16,
     paddingBottom: 20,
@@ -259,7 +238,7 @@ const styles = StyleSheet.create({
     width: 30 * SCALE,
     letterSpacing: 0.5,
   },
-  slider: {flex: 1, height: 32},
+  slider: { flex: 1, height: 32 },
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -271,8 +250,8 @@ const styles = StyleSheet.create({
     minWidth: 46 * SCALE,
     fontVariant: ['tabular-nums'],
   },
-  timeRight: {textAlign: 'right'},
-  progressSlider: {flex: 1, height: 40},
+  timeRight: { textAlign: 'right' },
+  progressSlider: { flex: 1, height: 40 },
   controlRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,8 +285,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 3,
   },
-  skipArrow: {fontSize: 16 * SCALE, color: '#D1D5DB'},
-  skipText: {fontSize: 11 * SCALE, color: '#9CA3AF', fontWeight: '600'},
+  skipArrow: { fontSize: 16 * SCALE, color: '#D1D5DB' },
+  skipText: { fontSize: 11 * SCALE, color: '#9CA3AF', fontWeight: '600' },
   playBtn: {
     width: PLAY_BTN,
     height: PLAY_BTN,

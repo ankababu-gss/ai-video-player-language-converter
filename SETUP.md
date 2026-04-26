@@ -1,27 +1,27 @@
 # Setup & Run Guide
 
-## Prerequisites
+This guide covers a full local setup from a fresh clone to a running app on an Android emulator or device. Follow every step in order to avoid known issues.
+
+---
+
+## 1. Prerequisites
 
 ### Node.js (v18 or higher)
 
-Download and install from [https://nodejs.org](https://nodejs.org).
+Download from [https://nodejs.org](https://nodejs.org). v20 is fine.
 
-Verify installation:
-```bash
-node --version
-# Expected: v18.x.x or higher
-
-npm --version
-# Expected: 9.x.x or higher
+```powershell
+node --version   # Expected: v18.x.x or higher
+npm --version    # Expected: 9.x.x or higher
 ```
 
 ---
 
 ### Java JDK 17
 
-React Native 0.73 requires **JDK 17** specifically (not 11, not 21).
+React Native 0.73 requires **JDK 17 exactly** (not 11, not 21).
 
-Download from [https://adoptium.net](https://adoptium.net) — choose **Temurin 17**.
+Download **Temurin 17** from [https://adoptium.net](https://adoptium.net).
 
 After installing, set environment variables:
 
@@ -30,16 +30,13 @@ After installing, set environment variables:
 | `JAVA_HOME` | `C:\Program Files\Eclipse Adoptium\jdk-17.x.x.x-hotspot` |
 | `PATH` (append) | `%JAVA_HOME%\bin` |
 
+> To find your exact JDK path: `where java` — copy everything before `\bin\java.exe`.
+
 Verify:
-```bash
-java -version
-# Expected: openjdk version "17.x.x" ...
-
-javac -version
-# Expected: javac 17.x.x
-
-echo %JAVA_HOME%
-# Expected: C:\Program Files\Eclipse Adoptium\jdk-17.x.x.x-hotspot
+```powershell
+java -version     # Expected: openjdk version "17.x.x"
+javac -version    # Expected: javac 17.x.x
+echo $env:JAVA_HOME  # Must print the JDK path, NOT %JAVA_HOME% literally
 ```
 
 ---
@@ -48,286 +45,211 @@ echo %JAVA_HOME%
 
 Download from [https://developer.android.com/studio](https://developer.android.com/studio).
 
-During installation, make sure these components are selected:
+During setup, install these components via **SDK Manager → SDK Tools**:
 
-- Android SDK (API **35**)
-- Android SDK Build-Tools **34.0.0**
-- NDK version **25.1.8937393**
-- Android Emulator
+| Component | Version |
+|---|---|
+| Android SDK Platform | API **35** |
+| Android SDK Build-Tools | **34.0.0** |
+| NDK (Side by side) | **25.1.8937393** |
+| Android Emulator | latest |
 
-> To install the NDK: Android Studio → SDK Manager → **SDK Tools** tab → check **NDK (Side by side)** → select version `25.1.8937393`.
+> To install NDK: Android Studio → SDK Manager → **SDK Tools** tab → check **NDK (Side by side)** → expand and select `25.1.8937393`.
 
-After installing, set environment variables:
+Set environment variables:
 
 | Variable | Value |
 |---|---|
 | `ANDROID_HOME` | `C:\Users\<YourName>\AppData\Local\Android\Sdk` |
-| `PATH` (append) | `%ANDROID_HOME%\emulator` |
 | `PATH` (append) | `%ANDROID_HOME%\platform-tools` |
-| `PATH` (append) | `%ANDROID_HOME%\cmdline-tools\latest\bin` |
+| `PATH` (append) | `%ANDROID_HOME%\emulator` |
 
 Verify:
-```bash
-adb --version
-# Expected: Android Debug Bridge version 1.x.x
+```powershell
+adb --version        # Expected: Android Debug Bridge version 1.x.x
+echo $env:ANDROID_HOME  # Must print the SDK path
+```
 
-sdkmanager --version
-# Expected: a version number like 12.0
+> If `adb` is not recognized in a new terminal, run:
+> ```powershell
+> $env:PATH += ";C:\Users\<YourName>\AppData\Local\Android\Sdk\platform-tools"
+> ```
 
-echo %ANDROID_HOME%
-# Expected: C:\Users\<YourName>\AppData\Local\Android\Sdk
+---
 
-# List installed SDK packages (confirms SDK, build-tools, NDK are present)
-sdkmanager --list_installed
-# Look for lines containing:
-#   build-tools;34.0.0
-#   ndk;25.1.8937393
-#   platforms;android-35
+## 2. Clone the Repository
+
+```powershell
+git clone <repository-url>
+cd "ai-video-player-language-converter"
 ```
 
 ---
 
-### Verify All Prerequisites at Once
+## 3. Install Dependencies
 
-Run all checks in one go to confirm everything is ready:
-
-```bash
-node --version && npm --version && java -version && adb --version
-# All four should print version numbers without errors
-```
-
----
-
-## Project Setup
-
-### 1. Open the project
-
-```bash
-cd "D:\AB Repo\ai-video-player-language-converter"
-
-# Confirm you are in the right directory
-ls
-# Should show: android/  src/  package.json  index.js  etc.
-```
-
-### 2. Install dependencies
-
-```bash
+```powershell
 npm install
-
-# Verify node_modules were created
-ls node_modules | head -5
-# Should list several package folders
 ```
 
-### 3. Create the debug keystore (first time only)
+> `react-native-gesture-handler` is pinned to `^2.14.1` in `package.json`. Do **not** upgrade it — newer versions require Android Gradle Plugin 8.6+ which is incompatible with this project's AGP 8.1.1.
 
-```bash
-# Check if it already exists first
-ls android/app/debug.keystore
+---
 
-# If not found, create it:
-cd android/app
-keytool -genkey -v -keystore debug.keystore -alias androiddebugkey \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -storepass android -keypass android \
-  -dname "CN=Android Debug"
-cd ../..
+## 4. Create `android/local.properties`
 
-# Verify it was created
-ls -lh android/app/debug.keystore
-# Should show a file ~2-3 KB
-```
-
-### 4. Create `android/local.properties` (if missing)
-
-```bash
-# Check if it already exists
+Check if it exists:
+```powershell
 ls android/local.properties
 ```
 
-If not found, create the file `android/local.properties` with this content (adjust path to your machine):
+If not found, create the file `android/local.properties` with this content (adjust to your username):
 
 ```
 sdk.dir=C\:\\Users\\<YourName>\\AppData\\Local\\Android\\Sdk
 ```
 
-Verify the path inside it is correct:
-```bash
-cat android/local.properties
-# Expected: sdk.dir=C\:\\Users\\<YourName>\\AppData\\Local\\Android\\Sdk
+---
+
+## 5. Allow Metro Through Windows Firewall
+
+Run once (as Administrator or accept the UAC prompt):
+
+```powershell
+netsh advfirewall firewall add rule name="Metro 8081" dir=in action=allow protocol=TCP localport=8081
+```
+
+> Without this rule, the emulator cannot connect to the Metro bundler on Windows.
+
+---
+
+## 6. Start an Android Emulator
+
+**Option A — Android Studio (recommended):**
+1. Open Android Studio → **Device Manager** (right toolbar)
+2. Click **Create Device** → choose **Pixel 6** → select **API 34** system image → Finish
+3. Click the **Play ▶** button to start
+
+**Option B — Command line:**
+```powershell
+$env:PATH += ";C:\Users\<YourName>\AppData\Local\Android\Sdk\emulator"
+emulator -list-avds          # Lists available virtual devices
+emulator -avd Pixel_6_API_34 # Start a specific one (keep this terminal open)
+```
+
+Verify the emulator is detected:
+```powershell
+adb devices
+# Expected:
+# List of devices attached
+# emulator-5554   device
 ```
 
 ---
 
-## Connect a Device or Start an Emulator
+## 7. Run the App
 
-### Option A — Physical Android phone
+Open **two separate terminals** in the project root.
 
-1. On your phone: **Settings → About phone → tap Build number 7 times** to unlock Developer Options.
-2. Go to **Settings → Developer Options** and enable **USB Debugging**.
-3. Connect the phone via USB cable and accept the RSA fingerprint prompt on the phone.
-4. Verify the device is detected:
-   ```bash
-   adb devices
-   # Expected output:
-   # List of devices attached
-   # R5CX123ABC   device
-   #
-   # If it shows "unauthorized" — accept the prompt on the phone and retry.
-   # If list is empty — replug the cable or run: adb kill-server && adb start-server
+### Terminal 1 — Start Metro
 
-   # Check device Android version
-   adb shell getprop ro.build.version.release
-   # Expected: 10, 11, 12, 13, or 14
-
-   # Check device architecture (useful for APK compatibility)
-   adb shell getprop ro.product.cpu.abi
-   # Expected: arm64-v8a (most modern phones)
-   ```
-
-### Option B — Android Emulator
-
-1. Open Android Studio → **Device Manager** (right toolbar).
-2. Click **Create Device** → choose a phone profile (e.g., Pixel 6).
-3. Select a system image with API **34** or higher → download if needed.
-4. Click **Finish**, then click the **Play** button to start the emulator.
-5. Verify it appears:
-   ```bash
-   adb devices
-   # Expected:
-   # List of devices attached
-   # emulator-5554   device
-
-   # Start a specific emulator from the command line (alternative to Android Studio UI)
-   emulator -list-avds
-   # Lists all available virtual devices, e.g.: Pixel_6_API_34
-
-   emulator -avd Pixel_6_API_34
-   # Starts that emulator (run this in a separate terminal, keep it open)
-   ```
-
----
-
-## Run the Application
-
-Open **two separate terminal windows** in the project root.
-
-### Terminal 1 — Start Metro bundler
-
-```bash
+```powershell
 npm start
-
-# You should see:
-#  BUNDLE  ./index.js
-#  Metro waiting on http://localhost:8081
 ```
 
-Keep this running. Metro serves the JavaScript bundle to the app.
+Wait until you see:
+```
+info Dev server ready
+```
 
-### Terminal 2 — Build and install on device
+### Terminal 2 — Build and Install
 
-```bash
+```powershell
 npm run android
-
-# This runs: react-native run-android
-# First build takes 3-10 minutes (Gradle downloads dependencies).
-# Subsequent builds are much faster.
-#
-# You should see near the end:
-#   BUILD SUCCESSFUL in Xs
-#   Installing APK ...
-#   Launched activity com.aivideoplayer/...MainActivity
 ```
 
-Check the installed APK on your device:
-```bash
-# Confirm APK is installed
-adb shell pm list packages | grep aivideoplayer
-# Expected: package:com.aivideoplayer
-
-# Check APK install path
-adb shell pm path com.aivideoplayer
-# Expected: package:/data/app/com.aivideoplayer-xxx/base.apk
-
-# Launch the app manually (if it doesn't open automatically)
-adb shell am start -n com.aivideoplayer/.MainActivity
+Wait for:
 ```
+BUILD SUCCESSFUL
+Installed on 1 device.
+```
+
+### Terminal 2 — Forward Metro port to emulator
+
+Run this **after** the app installs (required on Windows):
+
+```powershell
+adb reverse tcp:8081 tcp:8081
+```
+
+The app will launch automatically. If it shows a connection error, run `adb reverse` again then press `r` in Terminal 1 to reload.
 
 ---
 
-## First Launch
+## 8. First Launch Permissions
 
-On the first launch, the app will request permissions:
+On first open the app requests:
 
-1. **Storage / Media access** — tap **Allow**. Required to scan device storage for video files.
-2. **Modify system settings** (brightness control) — if prompted, the app opens the Android settings page; toggle **Allow modifying system settings** on for this app.
-
-Once permissions are granted, the app scans your device storage (up to 2 folder levels deep) and groups found videos by folder. Tap a folder to see the videos inside, then tap a video to play it.
-
-Check current app permissions via ADB:
-```bash
-adb shell dumpsys package com.aivideoplayer | grep permission
-# Look for: READ_MEDIA_VIDEO or READ_EXTERNAL_STORAGE showing as "granted=true"
-```
+1. **Storage / Media access** — tap **Allow** (required to scan for videos)
+2. **Modify system settings** (brightness) — if prompted, toggle it on in the system settings page that opens
 
 ---
 
-## Useful Commands
+## 9. Add a Test Video (Emulator Only)
 
-```bash
-# Type-check TypeScript without building
+The emulator has no videos by default. Push one from your PC:
+
+```powershell
+adb push "C:\Users\<YourName>\Downloads\some-video.mp4" /storage/emulated/0/Download/test.mp4
+```
+
+Then tap **Scan Again** in the app. The video will appear grouped under the `Download` folder.
+
+---
+
+## 10. Useful Commands
+
+```powershell
+# Type-check TypeScript
 npm run tsc
-# No output = no errors
 
-# Run ESLint
+# Lint
 npm run lint
 
-# Run all tests
+# Run tests
 npm test
-
-# Run a single test file
-npx jest src/hooks/useVideoFiles.test.ts
 
 # Clear Metro cache (fixes stale bundle issues)
 npm start -- --reset-cache
 
-# Clean Gradle build cache
-cd android && ./gradlew clean && cd ..
+# Clean Gradle build
+cd android; ./gradlew clean; cd ..
 
-# Full clean + reinstall (nuclear option for persistent build issues)
-cd android && ./gradlew clean && cd .. && npm install && npm run android
-
-# View live app logs (useful for debugging)
-adb logcat --pid=$(adb shell pidof -s com.aivideoplayer)
-
-# View only React Native logs
+# View live app logs
 adb logcat -s ReactNativeJS
 
-# Uninstall the app from device
+# Uninstall app from device
 adb uninstall com.aivideoplayer
 
-# Check Gradle version used by the project
-cd android && ./gradlew --version && cd ..
-
-# Check React Native environment health
+# Check React Native environment
 npx react-native doctor
 ```
 
 ---
 
-## Troubleshooting
+## 11. Troubleshooting
 
-| Problem | Diagnostic Command | Solution |
+| Problem | Cause | Fix |
 |---|---|---|
-| `SDK location not found` | `cat android/local.properties` | Create `android/local.properties` with `sdk.dir=C\:\\Users\\<YourName>\\AppData\\Local\\Android\\Sdk` |
-| `NDK not configured` | `sdkmanager --list_installed \| grep ndk` | Install NDK `25.1.8937393` via Android Studio SDK Manager → SDK Tools |
-| `adb: no devices/emulators found` | `adb devices` | Run `adb kill-server && adb start-server`, replug USB or restart emulator |
-| `JAVA_HOME not set` | `echo %JAVA_HOME%` | Set `JAVA_HOME` to your JDK 17 installation directory and restart terminal |
-| Wrong Java version | `java -version` | Ensure JDK 17 is installed and `JAVA_HOME` points to it, not another version |
-| Metro bundle error on launch | `adb logcat -s ReactNativeJS` | Run `npm start -- --reset-cache` in Terminal 1 |
-| Gradle build fails | `cd android && ./gradlew clean && cd ..` | Clean then retry `npm run android` |
-| App installed but blank/white screen | `adb logcat -s ReactNativeJS` | Ensure Metro is running in Terminal 1 before launching the app |
-| Permission denied on storage scan | `adb shell dumpsys package com.aivideoplayer \| grep permission` | Go to **Settings → Apps → AI Video Player → Permissions** and grant Storage/Files |
-| `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | `adb shell pm list packages \| grep aivideoplayer` | Uninstall first: `adb uninstall com.aivideoplayer` then retry |
-| Port 8081 already in use | `netstat -ano \| findstr :8081` | Kill the process using that PID or run Metro on another port: `npm start -- --port 8082` |
+| `adb` not recognized | PATH not set | `$env:PATH += ";C:\Users\<You>\AppData\Local\Android\Sdk\platform-tools"` |
+| `JAVA_HOME` prints literally | Env var not set | Set `JAVA_HOME` in System Environment Variables and reopen terminal |
+| `SDK location not found` | `local.properties` missing | Create `android/local.properties` with `sdk.dir=C\:\\Users\\<You>\\AppData\\Local\\Android\\Sdk` |
+| `NDK not configured` | NDK not installed | Install NDK `25.1.8937393` via Android Studio SDK Manager → SDK Tools |
+| `Could not connect to development server` | Firewall or port issue | Add firewall rule (Step 5), then run `adb reverse tcp:8081 tcp:8081` |
+| `RNGestureHandlerModule not found` | Wrong gesture handler version | Run `npm install react-native-gesture-handler@2.14.1` |
+| `androidx.core requires AGP 8.6.0` | Gesture handler too new | Pin to `2.14.1`: `npm install react-native-gesture-handler@2.14.1` |
+| Metro bundle error (500) | Stale cache after version change | Stop Metro, run `npm start -- --reset-cache` |
+| App installed but blank screen | Metro not running | Ensure Terminal 1 (Metro) is running before launching |
+| `adb: no devices found` | Emulator not ready | Wait for emulator to fully boot, then retry `adb devices` |
+| Gradle build fails | Stale build cache | `cd android && ./gradlew clean && cd ..` then retry |
+| `No Videos Found` on emulator | No video files in storage | Push a video with `adb push` (see Step 9) |

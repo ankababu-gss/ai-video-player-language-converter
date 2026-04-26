@@ -1,25 +1,20 @@
-import React, {useRef, useEffect, useCallback, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import Video, {VideoRef, SelectedTrackType} from 'react-native-video';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { View, StyleSheet, StatusBar, TouchableWithoutFeedback } from 'react-native';
+import Video, { VideoRef, SelectedTrackType } from 'react-native-video';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import Orientation from 'react-native-orientation-locker';
-import {RootStackParamList} from '../navigation/AppNavigator';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import VideoControls from '../components/VideoControls';
-import {useVideoPlayer} from '../hooks/useVideoPlayer';
-import {useTVRemote} from '../hooks/useTVRemote';
-import {AudioTrack} from '../types';
+import { useVideoPlayer } from '../hooks/useVideoPlayer';
+import { useTVRemote } from '../hooks/useTVRemote';
+import { AudioTrack } from '../types';
 
 type RouteProps = RouteProp<RootStackParamList, 'Player'>;
 
 export default function PlayerScreen() {
   const route = useRoute<RouteProps>();
   const navigation = useNavigation();
-  const {videos, currentIndex: initialIndex} = route.params;
+  const { videos, currentIndex: initialIndex } = route.params;
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const currentVideo = videos[currentIndex];
   const videoRef = useRef<VideoRef>(null);
@@ -47,7 +42,7 @@ export default function PlayerScreen() {
   useEffect(() => {
     resetForNewVideo();
     videoRef.current?.seek(0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
   const handleRewind = useCallback(() => seek(-10), [seek]);
@@ -63,12 +58,12 @@ export default function PlayerScreen() {
   );
 
   const goToPrev = useCallback(() => {
-    setCurrentIndex(i => Math.max(0, i - 1));
+    setCurrentIndex((i) => Math.max(0, i - 1));
   }, []);
 
   const goToNext = useCallback(() => {
     if (currentIndex < videos.length - 1) {
-      setCurrentIndex(i => i + 1);
+      setCurrentIndex((i) => i + 1);
     } else {
       navigation.goBack();
     }
@@ -81,7 +76,7 @@ export default function PlayerScreen() {
         <View style={StyleSheet.absoluteFill}>
           <Video
             ref={videoRef}
-            source={{uri: `file://${currentVideo.path}`}}
+            source={{ uri: `file://${currentVideo.path}` }}
             style={StyleSheet.absoluteFill}
             resizeMode="contain"
             paused={state.paused}
@@ -89,16 +84,19 @@ export default function PlayerScreen() {
             rate={state.playbackSpeed}
             selectedAudioTrack={
               state.audioTracks.length > 1
-                ? {type: SelectedTrackType.INDEX, value: state.selectedAudioTrackIndex}
+                ? {
+                    type: SelectedTrackType.INDEX,
+                    value: state.selectedAudioTrackIndex,
+                  }
                 : undefined
             }
-            onLoad={data => {
+            onLoad={(data) => {
               setDuration(data.duration);
               if (data.audioTracks?.length) {
                 setAudioTracks(data.audioTracks as AudioTrack[]);
               }
             }}
-            onProgress={data => setCurrentTime(data.currentTime)}
+            onProgress={(data) => setCurrentTime(data.currentTime)}
             onEnd={goToNext}
             ignoreSilentSwitch="ignore"
           />
@@ -126,5 +124,5 @@ export default function PlayerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#000'},
+  container: { flex: 1, backgroundColor: '#000' },
 });

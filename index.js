@@ -1,5 +1,15 @@
-import {AppRegistry} from 'react-native';
+import { AppRegistry } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React from 'react';
 import App from './src/App';
-import {name as appName} from './app.json';
+import { name as appName } from './app.json';
 
-AppRegistry.registerComponent(appName, () => App);
+function Root() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <App />
+    </GestureHandlerRootView>
+  );
+}
+
+AppRegistry.registerComponent(appName, () => Root);
